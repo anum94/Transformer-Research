@@ -1,0 +1,10 @@
+test.ipynb
+.vscode/
+*.pyc
+.env
+lrz/runs/
+.ssh
+.ipynb_checkpoints
+.idea
+visualizations/
+.DS_Store

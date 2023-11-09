@@ -1,0 +1,32 @@
+{
+    "method": "finetune",
+
+    "exec_args" : {
+        "model": "bigbirdpegasus",
+        "dataset": "pubmed",
+        "metrics": ["rouge"],
+        "preview": false,
+        "samples": "max",
+        "min_input_size": 0
+    },
+    
+    "exec_kwargs": {
+        "enc_max_len": 4096,
+        "gen_max_len": 512,
+        "num_beams": 4,
+        "train_batch_size": 8,
+        "eval_batch_size": 32,
+        "gradient_accumulation_steps": 4,
+        "gradient_checkpointing": true,
+        "num_epochs": 1,
+        "optimizer": "adamw_apex_fused",
+        "learning_rate": 8e-4,
+        "lr_scheduler_type": "constant",
+        "warmup_steps": 0,
+        "evaluation_steps": 200,
+        "logging_steps": 25,
+        "fp16": false,
+        "bf16": true
+    }
+
+}

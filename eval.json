@@ -1,0 +1,20 @@
+{
+    "method": "eval",
+
+    "exec_args" : {
+        "model": "pegasusx",
+        "dataset": "arxiv",
+        "metrics": ["rouge"],
+        "preview": false,
+        "samples": "max",
+        "min_input_size": 0
+    },
+    
+    "exec_kwargs": {
+        "enc_max_len": 8192,
+        "gen_max_len": 256,
+        "num_beams": 1,
+        "batch_size": 8
+    }
+    
+}

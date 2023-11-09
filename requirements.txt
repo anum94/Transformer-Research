@@ -1,0 +1,15 @@
+torch
+transformers==4.33.1
+datasets
+evaluate[evaluator]
+sentencepiece
+rouge_score
+bert_score
+nltk
+python-dotenv
+deepspeed
+accelerate
+gitpython
+wandb
+bitsandbytes
+einops

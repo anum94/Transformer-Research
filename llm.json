@@ -1,0 +1,10 @@
+{
+    "dataset": "pubmed",
+    "preview": false,
+    "samples": "max",
+    "min_input_size": 0,
+    "max_length": 1024,
+    "max_new_tokens": 256,
+    "batch_size": 2,
+    "model_hf_key": "tiiuae/falcon-40b-instruct"
+}
