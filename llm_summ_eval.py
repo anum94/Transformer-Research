@@ -5,6 +5,7 @@ import argparse
 import logging
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from typing import Union
 
 # for sanity
 torch.cuda.empty_cache()
@@ -33,6 +34,7 @@ min_input_size = config["min_input_size"]
 max_length = config["max_length"]
 batch_size = config["batch_size"]
 max_new_tokens = config["max_new_tokens"]
+few_shot_examples = config["few_shot_examples"]
 
 model_hf_key = config["model_hf_key"]
 # for some models the tokenizer may not be available so we use a different one.
@@ -56,6 +58,7 @@ model_key = {
     "tiiuae/falcon-7b-instruct": "falcon7b",
     "baichuan-inc/baichuan-7B": "baichuan7b",
     "meta-llama/Llama-2-7b-chat-hf": "llama2chat7b",
+
 }
 
 
@@ -122,6 +125,35 @@ tokenizer = AutoTokenizer.from_pretrained(
 tokenizer.pad_token = tokenizer.eos_token
 model.generation_config.pad_token_id = model.generation_config.eos_token_id
 
+def filter_dataset(data, model_ctx_len: int, k: Union[int, bool] = False ):
+
+    # get a list of indices that contain samples with tokens less than df_filter_length
+
+    filter_length = int(model_ctx_len/k)
+
+    def fn(sample):
+        tok = tokenizer(
+            sample["text"] + sample["summary"],
+            return_tensors="pt",
+            truncation=True,
+        ).input_ids
+        if tok.shape[1] < filter_length:
+            return {"few-shot" :True}
+        return {"few-shot" :False}
+
+    data = data.map(fn)
+    indices = [idx for idx, b in enumerate(list(data["few-shot"])) if b]
+
+    # get a subset of the data using those indices and return it
+
+    return data.select(indices)
+
+
+prefix_dtest = filter_dataset(
+        prefix_dtest,
+        model_ctx_len=tokenizer.model_max_length,
+        k = few_shot_examples
+    )
 
 def tokenize_dataset(data, padding="max_length", truncation=True, max_len=1024):
     # get tokens for SUMMARY: in shape torch.Size([len])
@@ -198,6 +230,5 @@ with open(metrics_path, "w") as fp:
 with open(outputs_path, "w") as fp:
     json.dump(outputs, fp)
 
-print(metrics_path)
-print(outputs_path)
+print (config)
 print (len(outputs))
