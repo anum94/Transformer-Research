@@ -39,26 +39,23 @@ class HFDataset:
         col_map: dict,
         min_input_size: int,
     ) -> DatasetDict:
-        # removing samples where text is shorter than 2x summary
-        # where text is bigger than 1000x summary
-        # where summary is verbatim in text
-        # as per SCROLLS
 
-        # samples smaller than min_input_size also removed (defaults to 0)
-        # test ds remains the same
-
+        # conditions for admitting data into the training:
+        # 1) Text (x) is twice as long as summary (y) and less than 1000 times longer.
+        # 2) Summary is not a verbatim part of the text.
+        # 3) The text document has a minimum length (min_input_size).
         def mask(x, y):
             return (
-                len(x) > 2 * len(y)
-                and len(x) < 1000 * len(y)
-                and y not in x
-                and len(x) >= min_input_size
+                    2 * len(y) < len(x) < 1000 * len(y)
+                    and y not in x
+                    and len(x) >= min_input_size
             )
 
         def fn(batch: dict):
             res = {"text": [], "summary": []}
             z = zip(batch["text"], batch["summary"])
-            valid = list(filter(lambda x: mask(x[0], x[1]), z))
+            # apply the logical inverse of `mask` to obtain admissible documents.
+            valid = list(filter(lambda x: not mask(x[0], x[1]), z))
             res["text"] = [valid[idx][0] for idx in range(len(valid))]
             res["summary"] = [valid[idx][1] for idx in range(len(valid))]
             return res
