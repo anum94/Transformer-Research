@@ -55,16 +55,16 @@ class HFDataset:
             res = {"text": [], "summary": []}
             z = zip(batch["text"], batch["summary"])
             # apply the logical inverse of `mask` to obtain admissible documents.
-            valid = list(filter(lambda x: not mask(x[0], x[1]), z))
+            valid = list(filter(lambda x: mask(x[0], x[1]), z))
             res["text"] = [valid[idx][0] for idx in range(len(valid))]
             res["summary"] = [valid[idx][1] for idx in range(len(valid))]
             return res
 
         logging.info("Preprocessing dataset")
         data = data.rename_columns(col_map)
-        save_test = data["test"]
+        #save_test = data["test"]
         data = data.map(fn, batched=True)
-        data["test"] = save_test
+        #data["test"] = save_test
         data.set_format("torch")
         return data
 
